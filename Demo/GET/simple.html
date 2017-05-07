@@ -1,37 +1,13 @@
 <!DOCTYPE html>
 <html>
+<head>
+  <title>GET:simple</title>
+  <script type="text/javascript" src="../apijson.js">
+  </script>
+</head>
 <body>
 <script >
-    function format(json) {
-        return JSON.stringify(JSON.parse(json), null, "\t");
-    }
-
-
-    function response(rp) {
-        if(rp.readyState !== 4) {
-            return;
-        }
-        if(rp.status === 200){
-            alert("Response:\n" + format(rp.responseText));
-        } else {
-            alert("Response:\nstatus" + rp.status + "\nerror:" + rp.error);
-        }
-    }
-
-    function request(url, rq) {
-
-        alert("Request:\n" + rq);
-
-        var request = new XMLHttpRequest();
-        request.open("GET", url + rq);
-        request.onreadystatechange = function(){
-            response(request);
-        }
-        request.send(null);
-    }
-
-
-    var url = "http://192.168.1.103:8080/get/";
+    var url = "http://192.168.1.103:8080/get";
 
     var json = {
         "Moment":{
