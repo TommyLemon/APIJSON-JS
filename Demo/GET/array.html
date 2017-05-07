@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>GET:simple</title>
+  <script type="text/javascript" src="../apijson.js">
+  </script>
+</head>
+<body>
+<script >
+    var url = "http://192.168.1.103:8080/get";
+
+    var json = {
+        "User[]":{
+            "User":{
+                "name$":encodeURIComponent("%o%")
+            },
+            "count":5,
+            "page":1
+        }
+    };
+
+    request(url, json);
+</script>
+</body>
+</html>

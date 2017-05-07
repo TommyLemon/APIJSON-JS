@@ -1,5 +1,5 @@
 /**
- * Created by Tommy on 17/5/8.
+ * Created by Lemon on 17/5/8.
  */
 
 /**包含
@@ -57,11 +57,17 @@ var Method = new Array(
 )
 
 
+
 /**请求
  * @param url
  * @param rq
  */
-function request(url, rq) {
+function request(url, json) {
+    var rqf = format(JSON.stringify(json));
+
+    var rq = encodeURI(JSON.stringify(encode(json)));
+
+
     var method = url.substring(url.lastIndexOf("/") + 1, url.length);
     // alert("method=" + method);
     if (method == null || Method.contains(method) == false) {
@@ -73,7 +79,7 @@ function request(url, rq) {
 
     var METHOD = method.toUpperCase();
 
-    alert("Request(" + METHOD + "):\n" + rq);
+    alert("Request(" + METHOD + "):\n" + rqf);
 
 
     var request = new XMLHttpRequest();
@@ -92,6 +98,23 @@ function request(url, rq) {
 
     request.send(isGet ? null : rq);
 }
+
+/**编码JSON
+ * @param json
+ */
+function encode(json) {
+    // for (var item in json) {
+    //     console.log("json[" + item + "] = " + json[item]);
+    //     if (item instanceof String) {
+    //         json[item] = encodeURIComponent((json[item]);
+    //     } else if (item instanceof JSON) {
+    //         json[item] = encode(json[item]);
+    //     }
+    // }
+
+    return json;
+}
+
 
 /**格式化JSON串
  * @param json

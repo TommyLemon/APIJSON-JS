@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>GET:simple</title>
+  <script type="text/javascript" src="../apijson.js">
+  </script>
+</head>
+<body>
+<script >
+    var url = "http://192.168.1.103:8080/get";
+
+    var json = {
+        "[]":{
+            "count":3,
+            "page":0,
+            "Moment":{
+                "@column":"id,content,praiseUserIdList",
+                "userId{}":[
+                    38710,
+                    70793
+                ]
+            },
+            "User":{
+                "@column":"id,sex,name,head",
+                "id@":encodeURIComponent("/Moment/userId")
+            },
+            "Comment[]":{
+                "count":3,
+                "page":0,
+                "Comment":{
+                    "momentId@":encodeURIComponent("[]/Moment/id")
+                },
+            }
+        }
+    };
+
+    request(url, json);
+</script>
+</body>
+</html>
