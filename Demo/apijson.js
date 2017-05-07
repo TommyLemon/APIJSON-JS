@@ -84,6 +84,7 @@ function request(url, json) {
     alert("Request(" + METHOD + "):\n" + rqf);
 
 
+    //原生请求<<<<<<<<<<<<<<<<<<<<<<<<<<
     var request = new XMLHttpRequest();
     request.open(isGet ? "GET" : "POST", url + (isGet ? "/" + rq : ""), true);
     if (isGet == false) {
@@ -103,9 +104,10 @@ function request(url, json) {
     }
 
     request.send(isGet ? null : rq);
+    //原生请求>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 
-
+    //JQuery ajax请求<<<<<<<<<<<<<<<<<<<<<<<<<<
     // $.ajax({
     //     type: isGet ? "GET" : "POST",
     //     url: isGet ? url + "/" + rq : url,
@@ -116,6 +118,8 @@ function request(url, json) {
     //         alert(response);
     //     }
     // });
+    //JQuery ajax请求>>>>>>>>>>>>>>>>>>>>>>>>>>
+
 }
 
 /**编码JSON
