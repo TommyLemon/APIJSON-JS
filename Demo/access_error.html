@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Access Error</title>
+  <script type="text/javascript" src="apijson.js">
+  </script>
+</head>
+<body>
+<script >
+    var url = base_url + "/post_get";
+
+    var json = {
+        "tag":"Wallet",
+        "Wallet":{
+            "userId":38710
+        }
+    };
+
+    request(url, json);
+</script>
+</body>
+</html>

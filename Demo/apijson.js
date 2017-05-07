@@ -2,6 +2,8 @@
  * Created by Lemon on 17/5/8.
  */
 
+var base_url = "http://192.168.1.103:8080";
+
 /**包含
  * @param obj
  * @returns {boolean}
@@ -83,7 +85,11 @@ function request(url, json) {
 
 
     var request = new XMLHttpRequest();
-    request.open(method, url + "/" + (isGet ? rq : ""));
+    request.open(isGet ? "GET" : "POST", url + (isGet ? "/" + rq : ""), true);
+    if (isGet == false) {
+        request.setRequestHeader("Content-type","application/json");
+    }
+    request.setre
     request.onreadystatechange = function () {
         if(request.readyState !== 4) {
             return;
@@ -97,6 +103,19 @@ function request(url, json) {
     }
 
     request.send(isGet ? null : rq);
+
+
+
+    // $.ajax({
+    //     type: isGet ? "GET" : "POST",
+    //     url: isGet ? url + "/" + rq : url,
+    //     contentType: "application/json", //必须有
+    //     dataType: "json", //表示返回值类型，不必须
+    //     data: isGet ? null : rq,
+    //     success: function (response) {
+    //         alert(response);
+    //     }
+    // });
 }
 
 /**编码JSON
