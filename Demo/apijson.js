@@ -2,7 +2,7 @@
  * Created by Lemon on 17/5/8.
  */
 
-var base_url = "http://192.168.1.103:8080";
+var base_url = "http://139.196.140.118:8080";
 
 /**包含
  * @param obj
