@@ -90,7 +90,6 @@ function request(url, json) {
     if (isGet == false) {
         request.setRequestHeader("Content-type","application/json");
     }
-    request.setre
     request.onreadystatechange = function () {
         if(request.readyState !== 4) {
             return;
