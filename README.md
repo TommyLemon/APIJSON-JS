@@ -5,6 +5,6 @@ APIJSON JavaScript版。
 <br />
 <br />
 
-更多信息：
+详细介绍：
 
 https://github.com/TommyLemon/APIJSON
