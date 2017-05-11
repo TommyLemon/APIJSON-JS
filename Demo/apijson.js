@@ -64,7 +64,7 @@ var Method = new Array(
  * @param url
  * @param rq
  */
-function request(url, json) {
+function request(url, json, notAlertRequest, onreadystatechange) {
     var rqf = format(JSON.stringify(json));
 
     var rq = encodeURI(JSON.stringify(encode(json)));
@@ -81,21 +81,23 @@ function request(url, json) {
 
     var METHOD = method.toUpperCase();
 
-    alert("Request(" + METHOD + "):\n" + rqf);
+    if (! notAlertRequest) {
+        alert("Request(" + METHOD + "):\n" + rqf);
+    }
 
 
     //原生请求<<<<<<<<<<<<<<<<<<<<<<<<<<
     var request = new XMLHttpRequest();
     request.open(isGet ? "GET" : "POST", url + (isGet ? "/" + rq : ""), true);
     if (isGet == false) {
-        request.setRequestHeader("Content-type","application/json");
+        request.setRequestHeader("Content-type", "application/json");
     }
-    request.onreadystatechange = function () {
-        if(request.readyState !== 4) {
+    request.onreadystatechange = onreadystatechange != null ? onreadystatechange : function () {
+        if (request.readyState !== 4) {
             return;
         }
 
-        if(request.status === 200){
+        if (request.status === 200) {
             alert("Response(" + METHOD + "):\n" + format(request.responseText));
         } else {
             alert("Response(" + METHOD + "):\nstatus" + request.status + "\nerror:" + request.error);
@@ -119,6 +121,8 @@ function request(url, json) {
     // });
     //JQuery ajax请求>>>>>>>>>>>>>>>>>>>>>>>>>>
 
+
+    return request;
 }
 
 /**编码JSON
