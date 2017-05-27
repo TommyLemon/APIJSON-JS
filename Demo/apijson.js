@@ -67,7 +67,7 @@ var Method = new Array(
 function request(url, json, notAlertRequest, onreadystatechange) {
     var rqf = format(JSON.stringify(json));
 
-    var rq = encodeURI(JSON.stringify(encode(json)));
+    var rq = encodeURI(JSON.stringify(encode(json))); // JSON.stringify(encode(json)); //
 
 
     var method = url.substring(url.lastIndexOf("/") + 1, url.length);
@@ -93,16 +93,16 @@ function request(url, json, notAlertRequest, onreadystatechange) {
         request.setRequestHeader("Content-type", "application/json");
     }
     request.onreadystatechange = onreadystatechange != null ? onreadystatechange : function () {
-        if (request.readyState !== 4) {
-            return;
-        }
+            if (request.readyState !== 4) {
+                return;
+            }
 
-        if (request.status === 200) {
-            alert("Response(" + METHOD + "):\n" + format(request.responseText));
-        } else {
-            alert("Response(" + METHOD + "):\nstatus" + request.status + "\nerror:" + request.error);
+            if (request.status === 200) {
+                alert("Response(" + METHOD + "):\n" + format(request.responseText));
+            } else {
+                alert("Response(" + METHOD + "):\nstatus" + request.status + "\nerror:" + request.error);
+            }
         }
-    }
 
     request.send(isGet ? null : rq);
     //原生请求>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -125,18 +125,31 @@ function request(url, json, notAlertRequest, onreadystatechange) {
     return request;
 }
 
-/**编码JSON
+/**编码JSON，转义所有String
  * @param json
  */
 function encode(json) {
-    // for (var item in json) {
-    //     console.log("json[" + item + "] = " + json[item]);
-    //     if (item instanceof String) {
-    //         json[item] = encodeURIComponent((json[item]);
-    //     } else if (item instanceof JSON) {
-    //         json[item] = encode(json[item]);
-    //     }
-    // }
+    alert("encode  before:\n" + format(JSON.stringify(json)));
+
+    if (typeof json == "string") { //json instanceof String) {
+        json = encodeURIComponent(json);
+    }
+    else if (json instanceof Array) {
+        alert("encode  json instanceof Array");
+
+        for (var i = 0; i < json.length; i ++) {
+            alert("json[" + i + "] = " + format(JSON.stringify(json[i])));
+            json[i] = encode(json[i]);
+        }
+    }
+    else if (json instanceof Object) {
+        alert("encode  json instanceof Object");
+        for (var key in json) {
+            alert("encode  json[" + key + "] = " + format(JSON.stringify(json[key])));
+            json[key] = encode(json[key]);
+        }
+    }
+    alert("encode  after:\n" + format(JSON.stringify(json)));
 
     return json;
 }

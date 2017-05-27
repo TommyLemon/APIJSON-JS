@@ -14,21 +14,20 @@
             "count":3,
             "page":0,
             "Moment":{
-                "@column":"id,content,praiseUserIdList",
+                "@column":"id,userId,content,praiseUserIdList",
                 "userId{}":[
                     38710,
                     70793
                 ]
             },
             "User":{
-                "@column":"id,sex,name,head",
-                "id@":encodeURIComponent("/Moment/userId")
+                "@column":"id,name,head",
+                "id@":"/Moment/userId" //已通过encode函数自动转义 encodeURIComponent("/Moment/userId")
             },
-            "Comment[]":{
+            "[]":{
                 "count":3,
-                "page":0,
                 "Comment":{
-                    "momentId@":encodeURIComponent("[]/Moment/id")
+                    "momentId@":"[]/Moment/id" //已通过encode函数自动转义 encodeURIComponent("[]/Moment/id")
                 },
             }
         }
