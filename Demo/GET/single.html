@@ -7,25 +7,13 @@
 </head>
 <body>
 <script >
-    var url = base_url + "/get";
-
     var json = {
         "Moment":{
             "id":15
         }
     };
 
-    var request = request(url, json, true, function () {
-        if(request.readyState !== 4) {
-            return;
-        }
-
-        if (request.status === 200) {
-            alert("MyResponse:\n" + format(request.responseText));
-        } else {
-            alert("MyResponse:\nstatus" + request.status + "\nerror:" + request.error);
-        }
-    });
+    request(url_get, json);
 </script>
 </body>
 </html>

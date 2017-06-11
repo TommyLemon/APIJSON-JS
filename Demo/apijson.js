@@ -2,7 +2,15 @@
  * Created by Lemon on 17/5/8.
  */
 
-var base_url = "http://139.196.140.118:8080";
+var url_base = "http://139.196.140.118:8080";
+var url_get = url_base + "/get";
+var url_head = url_base + "/head";
+var url_post_get = url_base + "/post_get";
+var url_post_head = url_base + "/post_head";
+var url_post = url_base + "/post";
+var url_put = url_base + "/put";
+var url_delete = url_base + "/delete";
+
 
 /**包含
  * @param obj
@@ -112,14 +120,37 @@ function request(url, json, notAlertRequest, onreadystatechange) {
     // $.ajax({
     //     type: isGet ? "GET" : "POST",
     //     url: isGet ? url + "/" + rq : url,
-    //     contentType: "application/json", //必须有
-    //     dataType: "json", //表示返回值类型，不必须
+    //     contentType: "application/json", //必须
+    //     dataType: "json", //返回值类型，非必须
     //     data: isGet ? null : rq,
     //     success: function (response) {
     //         alert(response);
     //     }
     // });
     //JQuery ajax请求>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+    //VUE axios请求<<<<<<<<<<<<<<<<<<<<<<<<<<
+    // if (isGet) {
+    //     axios.get(url + "/" + rq, null)
+    //         .then(function (response)    {
+    //             console.log(response);
+    //         })
+    //         .catch(function (error) {
+    //             console.log(error);
+    //         });
+    // } else {
+    //     axios({
+    //         method: 'post',
+    //         url: url + "/",
+    //         data: json
+    //     }).then(function (response) {
+    //         alert(response);
+    //     }).catch(function (error) {
+    //         alert(error);
+    //     });
+    // }
+    //VUE axios请求>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 
     return request;
@@ -129,27 +160,27 @@ function request(url, json, notAlertRequest, onreadystatechange) {
  * @param json
  */
 function encode(json) {
-    alert("encode  before:\n" + format(JSON.stringify(json)));
+    // alert("encode  before:\n" + format(JSON.stringify(json)));
 
     if (typeof json == "string") { //json instanceof String) {
         json = encodeURIComponent(json);
     }
     else if (json instanceof Array) {
-        alert("encode  json instanceof Array");
+        // alert("encode  json instanceof Array");
 
         for (var i = 0; i < json.length; i ++) {
-            alert("json[" + i + "] = " + format(JSON.stringify(json[i])));
+            // alert("json[" + i + "] = " + format(JSON.stringify(json[i])));
             json[i] = encode(json[i]);
         }
     }
     else if (json instanceof Object) {
-        alert("encode  json instanceof Object");
+        // alert("encode  json instanceof Object");
         for (var key in json) {
-            alert("encode  json[" + key + "] = " + format(JSON.stringify(json[key])));
+            // alert("encode  json[" + key + "] = " + format(JSON.stringify(json[key])));
             json[key] = encode(json[key]);
         }
     }
-    alert("encode  after:\n" + format(JSON.stringify(json)));
+    // alert("encode  after:\n" + format(JSON.stringify(json)));
 
     return json;
 }
