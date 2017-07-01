@@ -66,31 +66,57 @@ var Method = new Array(
     "delete"
 )
 
+String.prototype.contains = function (c) {
+    return this.indexOf(c) >= 0;
+}
 
 
 /**请求
- * @param url
- * @param rq
+ * @param url                 请求地址
+ * @param json                请求内容
+ * @param notAlert            不弹窗显示
+ * @param callBack            请求成功回调
+ * @returns {XMLHttpRequest}
  */
-function request(url, json, notAlertRequest, onreadystatechange) {
-    var rqf = format(JSON.stringify(json));
+function request(url, json, notAlert, callBack) {
+    if (json == null || (json instanceof Object) == false) {
+        alertOfDebug("request   json == null || (json instanceof Object) == false !!! >> return null;");
+        return null;
+    }
+
+    if (url == null || (typeof url != "string")) {
+        alertOfDebug("request   url == null || typeof url != string !!! >> return null;");
+        return null;
+    }
+    if (url.length < 3 || url.contains(".") == false) {
+        alertOfDebug("request   url.length < 3 || url.contains(.) == false !!! >> return null;");
+        return null;
+    }
+    //TODO 这里应该用正则表达式
+    if (url.indexOf("http://") != 0 && url.indexOf("https://") != 0) {
+        alertOfDebug("request   url.indexOf(http://) != 0 && url.indexOf(https://) != 0 >> url = http:// + url;");
+        url = "http://" + url;
+    }
+
+
+    var rqf = format(json);
 
     var rq = encodeURI(JSON.stringify(encode(json))); // JSON.stringify(encode(json)); //
 
 
     var method = url.substring(url.lastIndexOf("/") + 1, url.length);
-    // alert("method=" + method);
+    // alertOfDebug("method=" + method);
     if (method == null || Method.contains(method) == false) {
-        alert("method is empty! url must endsWith \"/[method]\" !");
-        return;
+        alertOfDebug("method is empty! url must endsWith \"/[method]\" !");
+        // /login, /register 等都走POST   return null;
     }
     var isGet = method === Method[0] || method === Method[1];
-    // alert("isGet=" + isGet);
+    // alertOfDebug("isGet=" + isGet);
 
     var METHOD = method.toUpperCase();
 
-    if (! notAlertRequest) {
-        alert("Request(" + METHOD + "):\n" + rqf);
+    if (! notAlert) {
+        alertOfDebug("Request(" + METHOD + "):\n" + rqf);
     }
 
 
@@ -100,17 +126,24 @@ function request(url, json, notAlertRequest, onreadystatechange) {
     if (isGet == false) {
         request.setRequestHeader("Content-type", "application/json");
     }
-    request.onreadystatechange = onreadystatechange != null ? onreadystatechange : function () {
-            if (request.readyState !== 4) {
-                return;
+    request.onreadystatechange = function () {
+        if (request.readyState !== 4) {
+            return;
+        }
+
+        if (request.status === 200) {
+            if (! notAlert) {
+                alertOfDebug("Response(" + METHOD + "):\n" + format(request.responseText));
             }
 
-            if (request.status === 200) {
-                alert("Response(" + METHOD + "):\n" + format(request.responseText));
-            } else {
-                alert("Response(" + METHOD + "):\nstatus" + request.status + "\nerror:" + request.error);
+            if (callBack != null) {
+                callBack();
+                return;
             }
+        } else {
+            alertOfDebug("Response(" + METHOD + "):\nstatus:" + request.status + "\nerror:" + request.error);
         }
+    }
 
     request.send(isGet ? null : rq);
     //原生请求>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -124,7 +157,7 @@ function request(url, json, notAlertRequest, onreadystatechange) {
     //     dataType: "json", //返回值类型，非必须
     //     data: isGet ? null : rq,
     //     success: function (response) {
-    //         alert(response);
+    //         alertOfDebug(response);
     //     }
     // });
     //JQuery ajax请求>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -145,9 +178,9 @@ function request(url, json, notAlertRequest, onreadystatechange) {
     //         url: url + "/",
     //         data: json
     //     }).then(function (response) {
-    //         alert(response);
+    //         alertOfDebug(response);
     //     }).catch(function (error) {
-    //         alert(error);
+    //         alertOfDebug(error);
     //     });
     // }
     //VUE axios请求>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -157,38 +190,256 @@ function request(url, json, notAlertRequest, onreadystatechange) {
 }
 
 /**编码JSON，转义所有String
- * @param json
+ * @param json 任意类型
  */
 function encode(json) {
-    // alert("encode  before:\n" + format(JSON.stringify(json)));
+    // alertOfDebug("encode  before:\n" + format(JSON.stringify(json)));
 
     if (typeof json == "string") { //json instanceof String) {
         json = encodeURIComponent(json);
     }
     else if (json instanceof Array) {
-        // alert("encode  json instanceof Array");
+        // alertOfDebug("encode  json instanceof Array");
 
         for (var i = 0; i < json.length; i ++) {
-            // alert("json[" + i + "] = " + format(JSON.stringify(json[i])));
+            // alertOfDebug("json[" + i + "] = " + format(JSON.stringify(json[i])));
             json[i] = encode(json[i]);
         }
     }
     else if (json instanceof Object) {
-        // alert("encode  json instanceof Object");
+        // alertOfDebug("encode  json instanceof Object");
         for (var key in json) {
-            // alert("encode  json[" + key + "] = " + format(JSON.stringify(json[key])));
+            // alertOfDebug("encode  json[" + key + "] = " + format(JSON.stringify(json[key])));
             json[key] = encode(json[key]);
         }
     }
-    // alert("encode  after:\n" + format(JSON.stringify(json)));
+    // alertOfDebug("encode  after:\n" + format(JSON.stringify(json)));
 
     return json;
 }
 
 
 /**格式化JSON串
- * @param json
+ * @param json {}，JSON对象
  */
 function format(json) {
-    return JSON.stringify(JSON.parse(json), null, "\t");
+    if ((json instanceof Object) == false) {
+        alertOfDebug("format  json instanceof Object == false >> json = parseJSON(json);");
+        json = parseJSON(json);
+    }
+
+    return JSON.stringify(json, null, "\t");
 }
+
+/**将json字符串转为JSON对象
+ * @param s
+ */
+function parseJSON(s) {
+    if (s instanceof Object) {
+        alertOfDebug("parseJSON  s instanceof JSON >> return s;");
+        return s;
+    }
+
+    if (typeof s != "string") {
+        alertOfDebug("parseJSON  typeof json != string >> s = \"\" + s;");
+        s = "" + s;
+    }
+    // alertOfDebug("parseJSON  s = \n" + s);
+
+    return JSON.parse(s);
+}
+
+/**测试用的提示
+ * @param s
+ */
+function alertOfDebug(s) {
+    alert(s); //注释掉就都不会弹窗了
+}
+
+
+
+
+
+
+//常用请求<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+
+
+/**获取单个对象
+ * @param table    String, 对象名，如 "User"
+ * @param id       Long, 对象id，如 1
+ * @param notAlert 不弹窗显示
+ * @param callBack 请求成功回调
+ */
+function getObject(table, id, notAlert, callBack) {
+    alertOfDebug("getObject  table = " + table + "; id = " + id);
+
+    return request(url_get, newSingleJSON(table, { "id": id }, null), notAlert, callBack);
+}
+
+/**获取数组
+ * @param table    String, 对象名，如 "User"
+ * @param json     {}, 对象内容，如 {"sex":1}
+ * @param count    int, 每页数量
+ * @param page     int, 页码
+ * @param notAlert 不弹窗显示
+ * @param callBack 请求成功回调
+ */
+function getArray(table, json, count, page, notAlert, callBack) {
+    alertOfDebug("getArray  table = " + table + "; count = " + count + "; page = " + page
+        + "; json = \n" + format(json));
+
+    return request(url_get, newArrayJSON(table, json, count, page), notAlert, callBack);
+}
+
+/**新增单个对象
+ * @param table    String, 对象名，如 "User"
+ * @param json     {}, 对象内容，如 {"sex":1}
+ * @param notAlert 不弹窗显示
+ * @param callBack 请求成功回调
+ */
+function postObject(table, json, notAlert, callBack) {
+    alertOfDebug("postObject  table = " + table
+        + "; json = \n" + format(json));
+    if (json == null) {
+        alertOfDebug('POST 请求必须设置 table对象 ！');
+        return;
+    }
+    if (json['id'] != null) {
+        alertOfDebug('POST 请求不能设置 id ！');
+        return;
+    }
+
+    return request(url_post, newSingleJSON(table, json, table), notAlert, callBack);
+}
+/**修改单个对象
+ * @param table    String, 对象名，如 "User"
+ * @param json     {}, 对象内容，如 {"sex":1}
+ * @param notAlert 不弹窗显示
+ * @param callBack 请求成功回调
+ */
+function putObject(table, json, notAlert, callBack) {
+    alertOfDebug("putObject  table = " + table
+        + "; json = \n" + format(json));
+    if (json == null) {
+        alertOfDebug('PUT 请求必须设置 table对象 ！');
+        return;
+    }
+    if (json["id"] == null || json["id"] <= 0) {
+        alertOfDebug('PUT 请求必须设置 id 且 id > 0 ！');
+        return;
+    }
+
+    return request(url_put, newSingleJSON(table, json, table), notAlert, callBack);
+}
+/**删除单个对象
+ * @param table    String, 对象名，如 "User"
+ * @param id       Long, 对象id，如 1
+ * @param notAlert 不弹窗显示
+ * @param callBack 请求成功回调
+ */
+function deleteObject(table, id, notAlert, callBack) {
+    alertOfDebug("deleteObject  table = " + table + "; id = " + id);
+    if (id == null || id <= 0) {
+        alertOfDebug('DELETE 请求必须设置 id 且 id > 0 ！');
+        return;
+    }
+
+    return request(url_delete, newSingleJSON(table, { "id": id }, table), notAlert, callBack);
+}
+
+/**修改多个对象
+ * @param table    String, 对象名，如 "User"
+ * @param json     {}, 对象内容，如 {"sex":1}
+ * @param notAlert 不弹窗显示
+ * @param callBack 请求成功回调
+ */
+function putArray(table, json, notAlert, callBack) {
+    alertOfDebug("putArray  table = " + table
+        + "; json = \n" + format(json));
+    if (json == null) {
+        alertOfDebug('PUT 请求必须设置 table对象 ！');
+        return;
+    }
+    if (json["id{}"] == null) {
+        alertOfDebug('PUT 请求必须设置 id{} ！');
+        return;
+    }
+
+    return request(url_put, newSingleJSON(table, json, table + "[]"), notAlert, callBack);
+}
+/**删除多个对象
+ * @param table    String, 对象名，如 "User"
+ * @param idArray  [], 对象id数组，如 [1, 2, 3]
+ * @param notAlert 不弹窗显示
+ * @param callBack 请求成功回调
+ */
+function deleteArray(table, idArray, notAlert, callBack) {
+    alertOfDebug("deleteArray  table = " + table
+        + "; idArray = \n" + format(idArray));
+    if (idArray == null) {
+        alertOfDebug('DELETE 请求必须设置 id{} ！');
+        return;
+    }
+
+    return request(url_delete, newSingleJSON(table, { "id{}": idArray }, table + "[]"), notAlert, callBack);
+}
+
+
+
+/**新建单个对象请求
+ * @param table    String, 对象名，如 "User"
+ * @param json     {}, 对象内容，如 {"sex":1}
+ * @param tag      String, 写操作标识，一般来说，操作单个对象时和table相同，操作多个对象时是 table[]
+ */
+function newSingleJSON(table, json, tag) {
+    // alertOfDebug("newSingleJSON  table = " + table + "; tag = " + tag
+    //     + "; json = \n" + format(json));
+
+    return parseJSON(newSingleString(table, json, tag));
+}
+/**新建数组请求
+ * @param table    String, 对象名，如 "User"
+ * @param json     {}, 对象内容，如 {"sex":1}
+ * @param count    int, 每页数量
+ * @param page     int, 页码
+ */
+function newArrayJSON(table, json, count, page) {
+    // alertOfDebug("newArrayJSON  table = " + table + "; count = " + count + "; page = " + page
+    //     + "; json = \n" + format(json));
+
+    return parseJSON(newArrayString(table, json, count, page));
+}
+
+
+/**新建单个对象请求
+ * @param table    String, 对象名，如 "User"
+ * @param json     {}, 对象内容，如 {"sex":1}
+ * @param tag      String, 写操作标识，一般来说，操作单个对象时和table相同，操作多个对象时是 table[]
+ */
+function newSingleString(table, json, tag) {
+    // alertOfDebug("newSingleString  table = " + table + "; tag = " + tag
+    //     + "; json = \n" + format(json));
+
+    return "{\""
+        + table + "\":"
+        + JSON.stringify(json)
+        + (tag == null || tag == '' ? "" : ",\"tag\":\"" + tag + "\"")
+        + "}";
+}
+/**新建数组请求
+ * @param table    String, 对象名，如 "User"
+ * @param json     {}, 对象内容，如 {"sex":1}
+ * @param count    int, 每页数量
+ * @param page     int, 页码
+ */
+function newArrayString(table, json, count, page) {
+    // alertOfDebug("newArrayString  table = " + table + "; count = " + count + "; page = " + page
+    //     + "; json = \n" + format(json));
+
+    return "{\"" + table + "[]\":{" + "\"count\":" + count + "," + "\"page\":" + page + ",\""
+        + table + "\":" + JSON.stringify(json) + "}}";
+}
+
+
+//常用请求>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
